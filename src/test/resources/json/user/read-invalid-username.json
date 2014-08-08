@@ -1,0 +1,6 @@
+{
+    "username": 123,
+    "fullName": "Some User",
+    "password": "supersecret",
+    "roles" : ["Administrator", "User"]
+}
