@@ -1,6 +1,0 @@
-INSERT INTO TBL_USER VALUES ('someuser', 'Some User', 'default.png');
-INSERT INTO TBL_USER VALUES ('someotheruser', 'Some Other User', 'default.png');
-INSERT INTO USER_PASSWORD VALUES ('someuser', 'f75778f7425be4db0369d09af37a6c2b9a83dea0e53e7bd57412e4b060e607f7');
-INSERT INTO USER_PASSWORD VALUES ('someotheruser', 'f75778f7425be4db0369d09af37a6c2b9a83dea0e53e7bd57412e4b060e607f7');
-INSERT INTO USER_ROLES VALUES ('someuser', 'ADMINISTRATOR');
-INSERT INTO USER_ROLES VALUES ('someotheruser', 'USER');

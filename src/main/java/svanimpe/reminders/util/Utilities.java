@@ -42,7 +42,7 @@ public class Utilities
      * The directory where the images will be stored. Make sure this directory exists before you run
      * the application.
      */
-    public static final java.nio.file.Path IMAGES_BASE_DIR = Paths.get(System.getProperty("user.home"), "Workspace", "GlassFish Files", "Reminders");
+    public static final java.nio.file.Path IMAGES_BASE_DIR = Paths.get(System.getProperty("user.home"), "app-root", "runtime", "repo", "diy", "files", "reminders");
 
     /*
      * The maximum allowed file size in megabytes.
