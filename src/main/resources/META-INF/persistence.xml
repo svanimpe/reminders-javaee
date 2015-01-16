@@ -7,6 +7,7 @@
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>
       <property name="eclipselink.weaving" value="false"/>
+      <property name="javax.persistence.sql-load-script-source" value="admin-setup.sql"/>
     </properties>
   </persistence-unit>
 </persistence>
