@@ -1,606 +1,134 @@
 <!doctype html>
-<html lang="en">
+<html>
     <head>
-        <title>Reminders API Documentation</title>
+        <title>Reminders</title>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" media="screen" href="bootstrap.min.css">
-        <script src="jquery.min.js"></script>
-        <script src="bootstrap.min.js"></script>
-        <style>
-            body {
-                padding-top: 60px
-            }
-            
-            #credentials, #users, #lists, #reminders {
-                padding-top: 70px;
-                margin-top: -70px;
-            }
-        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" media="screen" href="css/bootstrap.min.css">
+        <link rel="stylesheet" media="screen" href="css/bootstrap-responsive.min.css">
+        <link rel="stylesheet" media="screen" href="css/bootstrap-modal.css">
+        <link rel="stylesheet" media="screen" href="css/bootstrap-datetimepicker.min.css">
+        <link rel="stylesheet" media="screen" href="css/font-awesome.min.css">
+        <link rel="stylesheet" media="screen" href="css/styles.css">
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/bootstrap-modal.js"></script>
+        <script src="js/bootstrap-modalmanager.js"></script>
+        <script src="js/bootstrap-datetimepicker.min.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
+        <script src="js/script.js"></script>
     </head>
     <body>
-        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-            <div class="container-fluid">
-                <div class="navbar-header">  
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <p class="navbar-brand">Reminders API</p>
-                </div>
-
-                <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        <li><a href="#credentials">Credentials</a></li>
-                        <li><a href="#users">Users</a></li>
-                        <li><a href="#lists">Lists</a></li>
-                        <li><a href="#reminders">Reminders</a></li>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span4">
+                    <h1>Groups:</h1>
+                    <ul id="listList" class="nav nav-tabs nav-stacked">
                     </ul>
+                    <div class="row-fluid visible-phone">
+                        <div class="span12">
+                            <button class="btn listDialogToggle">Add Group</button>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="span8">
+                    <h1>Reminders:</h1>
+                    <ul id="reminderList" class="nav nav-tabs nav-stacked">  
+                    </ul>
+                    <div class="row-fluid visible-phone">
+                        <div class="span12">
+                            <button class="btn reminderDialogToggle">Add Reminder</button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-        </nav>
+            <div class="row-fluid hidden-phone">
+                <div class="span4">
+                    <button class="btn listDialogToggle">Add Group</button>
+                </div>
+                <div class="span8">
+                    <button class="btn reminderDialogToggle">Add Reminder</button>
+                </div>
+            </div>
+        </div>
         
-        <div class="container-fluid">
-            <h1>API Documentation</h1>
-
-            <p>
-                This document describes the API used for the Reminders webservice example.
-                All URLs below are relative and should be prefixed with
-                <mark>https://glassfish-svanimpe.rhcloud.com/reminders/api</mark>.
-            </p>
-
-            <p>
-                Whenever the service returns a <span class="label label-warning">400 Bad Request</span>, the body of the response will contain one or more error names.
-                See the corresponding domain rules to find out what exactly went wrong.
-                The generic <span class="label label-default">JSON</span> error means that either your input was invalid JSON or you
-                supplied a value of an incorrect type for one of the fields.
-            </p>
-            
-            <h2><a id="credentials">Credentials</a></h2>
-            
-            <h3>Domain rules</h3>
-            
-            <ul>
-                <li><span class="label label-default">CREDENTIALS_USERNAME</span> Credentials must contain a username.</li>
-                <li><span class="label label-default">CREDENTIALS_PASSWORD</span> Credentials must contain a password.</li>
-            </ul>
-            
-            <h3>Checking your credentials</h3>
-            
-            <p>
-                This resource is meant to facilitate implementing client-side login by allowing you to check your credentials
-                before attempting to authenticate a request with them.
-            </p>
-            <p>
-                To do so, use the <span class="label label-primary">POST /credentials</span> command.
-            </p>
-            <p>
-                This command expects input similar to:
-            </p>          
-<pre>
-{
-    "username" : "superuser",
-    "password" : "supersecret"
-}
-</pre>
-            <p>
-                This command returns <span class="label label-success">200 OK</span> along with an array of roles for the given username,
-                or <span class="label label-warning">400 Bad Request</span> if the input was invalid.
-            </p>
-            
-            <p>
-                This command obviously does not require authentication.
-            </p>
-            
-            <h2><a id="users">Users</a></h2>
-
-            <h3>Domain rules</h3>
-            
-            <ul>
-                <li><span class="label label-default">USER_USERNAME</span> A username is required, must be unique, can only contain alphabetical characters and must be between 8 and 255 characters in size.</li>
-                <li><span class="label label-default">USER_PASSWORD</span> A password is required and must be between 8 and 255 characters in size.</li>
-                <li><span class="label label-default">USER_ROLES</span> Valid roles are <code>"user"</code> and <code>"administrator"</code>.</li>
-                <li><span class="label label-default">USER_PICTURE</span>
-                    A custom profile picture must be a PNG or JPEG image no larger than 2MB in size.
-                    The image will be scaled down to a 200px by 200px PNG image.
-                </li>
-            </ul>
-            
-            <h3>Creating a new user</h3>
-            
-            <p>
-                To create a new user account, use the <span class="label label-primary">POST /users</span> command.
-            </p>
-            <p>
-                This command expects input similar to:
-            </p>          
-<pre>
-{
-    "username" : "superuser",
-    "fullName" : "Super User",
-    "password" : "supersecret",
-    "roles" : ["administrator"]
-}
-</pre>
-            <p>
-                Note that <code>fullName</code> is optional and that <code>roles</code> is currently ignored and defaults to <code>["user"]</code>.
-            </p>
-            <p>
-                This command returns <span class="label label-success">201 Created</span> upon success or <span class="label label-warning">400 Bad Request</span>
-                if the input was invalid.
-            </p>
-            <p>
-                This command currently does not require authentication (anyone can create a user account).
-            </p>
-            
-            <h3>Listing all users</h3>
-            
-            <p>
-                To list all users, use the <span class="label label-primary">GET /users</span> command.
-            </p>
-            <p>
-                This command should return <span class="label label-success">200 OK</span> with a body similar to:
-            </p>
-<pre>
-[
-    {
-        "username" : "superuser",
-        "fullName" : "Super User"
-    },
-    {
-        "username" : "someuser",
-        "fullName" : "John Doe"
-    }
-]
-</pre>
-            <p>
-                As <code>fullName</code> is optional, it will not be included if it is not known.
-            </p>
-            <p>
-                This command does not require authentication (user information is public).
-            </p>
-            
-            <h3>Requesting user information</h3>
-            
-            <p>
-                To request user information, use the <span class="label label-primary">GET /users/{username}</span> command.
-            </p>
-            <p>
-                This command returns <span class="label label-success">200 OK</span> with a body similar to:
-            </p>
-<pre>
-{
-    "username" : "someuser",
-    "fullName" : "John Doe",
-    "roles" : ["user"]
-}
-</pre>
-            <p>
-                or <span class="label label-warning">404 Not Found</span> if there is no user with the given username.
-            </p>
-            
-            <p>
-                As <code>fullName</code> is optional, it will not be included if it is not known.
-            </p>
-            <p>
-                This command does not require authentication (user information is public).
-            </p>
-            
-            <h3>Updating user information</h3>
-            
-            <p>
-                To update user information, use the <span class="label label-primary">PUT /users/{username}</span> command.
-            </p>
-            <p>
-                This command expects input similar to:
-            </p>
-<pre>
-{
-    "fullName" : "Jane Doe",
-    "password" : "evenmoresupersecret",
-    "roles" : ["admin"]
-}
-</pre>
-            <p>
-                All fields are optional. You only need to specify those fields you wish to change.
-                You can clear a user's full name by setting it to <code>null</code>.
-            </p>
-            <p>
-                This command returns <span class="label label-success">204 No Content</span> upon success, <span class="label label-warning">400 Bad Request</span>
-                if the input was invalid or <span class="label label-warning">404 Not Found</span> if there is no user with the given username.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user with the specified username.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-                Only admins are allowed to change roles.
-            </p>
-            
-            <h3>Deleting a user</h3>
-            
-            <p>
-                To delete a user account, use the <span class="label label-primary">DELETE /users/{username}</span> command.
-            </p>
-            <p>
-                This command returns <span class="label label-success">204 No Content</span> upon success or <span class="label label-warning">404 Not Found</span>
-                if there is no user with the given username.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user with the specified username.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-            </p>
-            
-            <h3>Requesting a profile picture</h3>
-            
-            <p>
-                To request a profile picture, use the <span class="label label-primary">GET /users/{username}/picture</span> command.
-            </p>
-            <p>
-                This command returns <span class="label label-success">200 OK</span> and a PNG image or <span class="label label-warning">404 Not Found</span>
-                if there is no user with the given username.
-            </p>
-            <p>
-                This command does not require authentication (user information is public).
-            </p>
-            
-            <h3>Updating a profile picture</h3>
-            
-            <p>
-                To update a profile picture, use the <span class="label label-primary">PUT /users/{username}/picture</span> command.
-            </p>
-            <p>
-                This command expects a PNG or JPEG image as input.
-            </p>
-            <p>
-                This command returns <span class="label label-success">204 No Content</span> upon success, <span class="label label-warning">400 Bad Request</span>
-                if the image was larger than the allowed maximum or <span class="label label-warning">404 Not Found</span> if there is no user with the given username.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user with the specified username.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-            </p>
-            
-            <h3>Deleting a profile picture</h3>
-            
-            <p>
-                To delete a profile picture and revert back to the default profile picture, use the <span class="label label-primary">DELETE /users/{username}/picture</span> command.
-            </p>
-            <p>
-                This command returns <span class="label label-success">204 No Content</span> upon success or <span class="label label-warning">404 Not Found</span>
-                if there is no user with the given username.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user with the specified username.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-            </p>
-            
-            <h2><a id="lists">Lists</a></h2>
-            
-            <h3>Domain rules</h3>
-            
-            <ul>
-                <li><span class="label label-default">LIST_TITLE</span> A list must have a non-empty title.</li>
-                <li>Lists have automatically generated ids.</li>
-                <li>A list must be assigned to a user that is the list's owner. This is most often done automatically.</li>
-            </ul>
-            
-            <h3>Creating a new list</h3>
-            
-            <p>
-                To create a new list, use the <span class="label label-primary">POST /lists</span> command.
-            </p>
-            <p>
-                This command expects input similar to:
-            </p>          
-<pre>
-{
-    "title" : "Work",
-    "owner" : "someuser"
-}
-</pre>
-            <p>
-                You usually don't need to specify <code>owner</code>. If you don't, the username you used for authentication will be used.
-            </p>
-            <p>
-                This command returns <span class="label label-success">201 Created</span> upon success or <span class="label label-warning">400 Bad Request</span>
-                if the input was invalid.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin or user credentials.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-                Only admins can create lists for users other than themselves.
-            </p>
-            
-            <h3>Listing your lists</h3>
-            
-            <p>
-                To get an overview of all your lists, use the <span class="label label-primary">GET /lists</span> command.
-            </p>
-            <p>
-                This command should return <span class="label label-success">200 OK</span> with a body similar to:
-            </p>
-<pre>
-[
-    {
-        "id" : 1,
-        "title" : "Work",
-        "size" : 3
-    },
-    {
-        "id" : 2,
-        "title" : "Notes",
-        "size" : 0
-    }
-]
-</pre>
-            <p>
-                This command requires authentication. You need to supply either admin or user credentials.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-            </p>
-            
-            <h3>Requesting list information</h3>
-            
-            <p>
-                To request list information, use the <span class="label label-primary">GET /lists/{listid}</span> command.
-            </p>
-            <p>
-                This command returns <span class="label label-success">200 OK</span> with a body similar to:
-            </p>
-<pre>
-{
-    "id" : 1,
-    "owner" : "someuser",
-    "title" : "Work",
-    "size" : 3
-}
-</pre>
-            <p>
-                or <span class="label label-warning">404 Not Found</span> if there is no list with the given id.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user who owns the list.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-            </p>
-            
-            <h3>Updating list information</h3>
-            
-            <p>
-                To update list information, use the <span class="label label-primary">PUT /lists/{listid}</span> command.
-            </p>
-            <p>
-                This command expects input similar to:
-            </p>
-<pre>
-{
-    "title" : "Home",
-    "owner" : "someotheruser"
-}
-</pre>
-            <p>
-                All fields are optional. You only need to specify those fields you wish to change.
-            </p>
-            <p>
-                This command returns <span class="label label-success">204 No Content</span> upon success, <span class="label label-warning">400 Bad Request</span>
-                if the input was invalid or <span class="label label-warning">404 Not Found</span> if there is no list with the given id
-                or if you specified an unknown username.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user who owns the list.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-                Only admins can change the owner of a list.
-            </p>
-            
-            <h3>Deleting a list</h3>
-            
-            <p>
-                To delete a list, use the <span class="label label-primary">DELETE /lists/{listid}</span> command.
-            </p>
-            <p>
-                This command returns <span class="label label-success">204 No Content</span> upon success or <span class="label label-warning">404 Not Found</span>
-                if there is no list with the given id.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user who owns the list.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-            </p>
-            
-            <h2><a id="reminders">Reminders</a></h2>
-            
-            <h3>Domain rules</h3>
-            
-            <ul>
-                <li><span class="label label-default">REMINDER_TITLE</span> A reminder must have a non-empty title.</li>
-                <li><span class="label label-default">REMINDER_IMAGE</span>
-                    An image attached to a reminder must be a JPEG image no larger than 10MB in size.
-                </li>
-                <li>Reminders have automatically generated ids.</li>
-                <li>A reminder must be assigned to a list. This is most often done automatically.</li>
-            </ul>
-            
-            <h3>Listing all reminders in a list</h3>
-            
-            <p>
-                To request all reminders in a list, use the <span class="label label-primary">GET /lists/{listid}/reminders</span> command.
-            </p>
-            <p>
-                This command returns <span class="label label-success">200 OK</span> with a body similar to:
-            </p>
-<pre>
-[
-    {
-        "id" : 1,
-        "title" : "Write some code",
-        "date" : 1378809045000
-    }
-]
-</pre>
-            <p>
-                or <span class="label label-warning">404 Not Found</span> if there is no list with the given id.
-            </p>
-            <p>
-                As <code>date</code> is optional, it will not be included if it is not known.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user who owns the list.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-            </p>
-            
-            <h3>Adding a reminder to a list</h3>
-            
-            <p>
-                To add a new reminder to a list, use the <span class="label label-primary">POST /lists/{listid}/reminders</span> command.
-            </p>
-            <p>
-                This command expects input similar to:
-            </p>          
-<pre>
-{
-    "title" : "Write even more code",
-    "date" : 1378809045000,
-    "location" : {
-        "latitude" : 50.1,
-        "longitude" : 2.74
-    }
-}
-</pre>
-            <p>
-                The reminder will be added to the list with the given id. Both <code>date</code> and <code>location</code> are optional.
-            </p>
-            <p>
-                This command returns <span class="label label-success">201 Created</span> upon success, <span class="label label-warning">400 Bad Request</span>
-                if the input was invalid or <span class="label label-warning">404 Not Found</span> if there is no list with the given id.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user who owns the list.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-            </p>
-            
-            <h3>Requesting reminder information</h3>
-            
-            <p>
-                To request reminder information, use the <span class="label label-primary">GET /lists/{listid}/reminders/{reminderid}</span> command.
-            </p>
-            <p>
-                This command returns <span class="label label-success">200 OK</span> with a body similar to:
-            </p>
-<pre>
-{
-    "id" : 2,
-    "title" : "Write even more code",
-    "date" : 1378809045000,
-    "location" : {
-        "latitude" : 50.1,
-        "longitude" : 2.74
-    },
-    "image" : false
-}
-</pre>
-            <p>
-                or <span class="label label-warning">404 Not Found</span> if there is no list with the given id or if there is no reminder with the given id
-                in this list.
-            </p>
-            <p>
-                As <code>date</code> and <code>location</code> are optional, they will not be included if they are not known. <code>image</code> indicates
-                whether or not this reminder has an image attached.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user who owns the list.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-            </p>
-            
-            <h3>Updating reminder information</h3>
-            
-            <p>
-                To update reminder information, use the <span class="label label-primary">PUT /lists/{listid}/reminders/{reminderid}</span> command.
-            </p>
-            <p>
-                This command expects input similar to:
-            </p>
-<pre>
-{
-    "list" : 1,
-    "title" : "Delete some code",
-    "date" : 1378809045001,
-    "location" : {
-        "latitude" : 50.2,
-        "longitude" : 2.73
-    }
-}
-</pre>
-            <p>
-                All fields are optional. You only need to specify those fields you wish to change. As <code>date</code> and <code>location</code> are optional,
-                they can be cleared by setting them to <code>null</code>.
-            </p>
-            <p>
-                This command returns <span class="label label-success">204 No Content</span> upon success, <span class="label label-warning">400 Bad Request</span>
-                if the input was invalid or <span class="label label-warning">404 Not Found</span> if there is no list with the given id
-                or if there is no reminder with the given id in this list.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user who owns the list.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-                Only admins are allowed to move reminders between lists of different owners.
-            </p>
-            
-            <h3>Deleting a reminder</h3>
-            
-            <p>
-                To delete a reminder, use the <span class="label label-primary">DELETE /lists/{listid}/reminders/{reminderid}</span> command.
-            </p>
-            <p>
-                This command returns <span class="label label-success">204 No Content</span> upon success or <span class="label label-warning">404 Not Found</span>
-                if there is no list with the given id or if there is no reminder with the given id in this list.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user who owns the list.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-            </p>
-            
-            <h3>Requesting an image attachment</h3>
-            
-            <p>
-                To request the image attached to a reminder, use the <span class="label label-primary">GET /lists/{listid}/reminders/{reminderid}/image</span> command.
-            </p>
-            <p>
-                This command returns <span class="label label-success">200 OK</span> and a JPEG image or <span class="label label-warning">404 Not Found</span>
-                if there is no list with the given id, if there is no reminder with the given id in this list or if this reminder does not have an image attached.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user who owns the list.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-            </p>
-            
-            <h3>Updating an image attachment</h3>
-            
-            <p>
-                To update the image attached to a reminder, use the <span class="label label-primary">PUT /lists/{listid}/reminders/{reminderid}/image</span> command.
-            </p>
-            <p>
-                This command expects JPEG image as input.
-            </p>
-            <p>
-                This command returns <span class="label label-success">204 No Content</span> upon success, <span class="label label-warning">400 Bad Request</span>
-                if the image was larger than the allowed maximum or <span class="label label-warning">404 Not Found</span> if there is no list with the given id
-                or if there is no reminder with the given id in this list.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user who owns the list.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-            </p>
-            
-            <h3>Deleting an image attachment</h3>
-            
-            <p>
-                To delete the image attached to a reminder, use the <span class="label label-primary">DELETE /lists/{listid}/reminders/{reminderid}/image</span> command.
-            </p>
-            <p>
-                This command returns <span class="label label-success">204 No Content</span> upon success or <span class="label label-warning">404 Not Found</span>
-                if there is no list with the given id, if there is no reminder with the given id in this list or if this reminder does not have an image attached.
-            </p>
-            <p>
-                This command requires authentication. You need to supply either admin credentials or credentials for the user who owns the list.
-                This command returns <span class="label label-warning">403 Forbidden</span> if you fail to do so.
-            </p>
+        <div id="listDialog" class="modal hide fade">
+            <div class="modal-header">
+                <h3>Add Group</h3>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="listTitle">Title:</label>
+                        <div class="controls">
+                            <input id="listTitle" type="text" placeholder="Title">
+                        </div>
+                    </div>
+                    <div class="alert alert-error"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="listDialogDelete" class="btn btn-danger pull-left"><i class="icon-trash"></i> Delete</button>
+                <button id="listDialogCancel" class="btn">Cancel</button>
+                <button id="listDialogSave" class="btn btn-primary"><i class="icon-save"></i> Save</button>
+            </div>
+        </div>
+        
+        <div id="reminderDialog" class="modal hide fade">
+            <div class="modal-header">
+                <h3>Add Reminder</h3>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="reminderListSelect">Group:</label>
+                        <div class="controls">
+                            <select id="reminderListSelect">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="reminderTitle">Title:</label>
+                        <div class="controls">
+                            <input id="reminderTitle" type="text" placeholder="Title">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="reminderDate">Due Date:</label>
+                        <div class="controls">
+                            <div id="datePicker" class="input-append date">
+                                <input id="reminderDate" type="text" data-format="dd/MM/yyyy hh:mm">
+                                <span class="add-on">
+                                    <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-error"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="reminderDialogDelete" class="btn btn-danger pull-left"><i class="icon-trash"></i> Delete</button>
+                <button id="reminderDialogCancel" class="btn">Cancel</button>
+                <button id="reminderDialogSave" class="btn btn-primary"><i class="icon-save"></i> Save</button>
+            </div>
+        </div>
+        
+        <div id="mapDialog" class="modal hide fade">
+            <div class="modal-header">
+                <h3>Attach A Location</h3>
+            </div>
+            <div class="modal-body">
+                <div id="map">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="mapDialogDelete" class="btn btn-danger pull-left"><i class="icon-trash"></i> Delete</button>
+                <button id="mapDialogCancel" class="btn">Cancel</button>
+                <button id="mapDialogSave" class="btn btn-primary"><i class="icon-save"></i> Save</button>
+            </div>
         </div>
     </body>
 </html>
